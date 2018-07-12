@@ -7,7 +7,6 @@ Main of the recognition face programm
 Author : Camille CHRETIEN
 maj : 11/07/2018
 '''
-
 import cv2
 
 # to make it dynamic with Qt
@@ -16,21 +15,37 @@ image_name = "test.JPG"
 
 face_cascade_path = "haarcascade_frontalface_default.xml"
 
-scale_factor = 1.1
-min_square = 5
+# COnstants
+scale_factor = 1.3
+min_square = 8
+max_heigh = 400
+max_width = 600
 
 print("Opening :", image_name)
 photograph_to_analyse = cv2.imread(image_path + image_name)
-photograph_to_analyse_width = photograph_to_analyse.shape[1]
-photograph_to_analyse_heigh = photograph_to_analyse.shape[0]
-print("Width :", photograph_to_analyse_width, "Heigh :", photograph_to_analyse_heigh)
 
-if photograph_to_analyse != None:
-    photograph_to_analyse = cv2.resize(photograph_to_analyse,
-                                      (photograph_to_analyse_width / 10, photograph_to_analyse_heigh / 10))
 
-    cv2.imshow("1", photograph_to_analyse)
-    cv2.waitKey(0)
+if len(photograph_to_analyse.shape) != 0:
+    '''
+    searching for the heighest ratio to resize the photograph in order to have a
+    faster faster face search time
+    '''
+    photograph_to_analyse_width = photograph_to_analyse.shape[1]
+    photograph_to_analyse_heigh = photograph_to_analyse.shape[0]
+
+    resized_heigh = photograph_to_analyse_heigh
+    resized_width = photograph_to_analyse_width
+
+    if ((photograph_to_analyse_heigh > max_heigh) or (photograph_to_analyse_width > max_width)):
+        heigh_ratio = photograph_to_analyse_heigh / max_heigh
+        width_ratio = photograph_to_analyse_width / max_width
+
+        if ((heigh_ratio > width_ratio) or (heigh_ratio == width_ratio)):
+            photograph_to_analyse = cv2.resize(photograph_to_analyse,
+                                              (photograph_to_analyse_width / heigh_ratio, photograph_to_analyse_heigh / heigh_ratio))
+        else :
+            photograph_to_analyse = cv2.resize(photograph_to_analyse,
+                                              (photograph_to_analyse_width / width_ratio, photograph_to_analyse_heigh / width_ratio))
 
     print("Loading Haar Cascade")
     haar_cascade_face = cv2.CascadeClassifier(face_cascade_path)
